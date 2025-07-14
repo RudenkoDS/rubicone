@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Какой дом в "Заповедном" тебе подходит по знаку зодиака?</title>
+<style>
+  body {font-family: Arial, sans-serif; margin:0; padding:0; background:#f5f5f5; color:#333;}
+  .container {max-width:600px; margin:40px auto; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
+  h1,h2 {text-align:center;}
+  .question {display:none; animation:fadeIn 0.5s forwards;}
+  .answers {margin:20px 0;}
+  .answers label {display:block; margin:8px 0; cursor:pointer;}
+  button {padding:10px 20px; font-size:16px; cursor:pointer; border:none; background:#4CAF50; color:white; border-radius:4px;}
+  button:disabled {background:#ccc; cursor:not-allowed;}
+  #result {display:none; animation:fadeIn 0.5s forwards;}
+  @keyframes fadeIn {from {opacity:0; transform:translateY(20px);} to {opacity:1; transform:none;}}
+</style>
+</head>
+<body>
+<div class="container" id="start">
+  <h1>Какой дом в "Заповедном" тебе подходит по знаку зодиака?</h1>
+  <p>Пройди небольшой тест из 4 вопросов и узнай свой идеальный дом.</p>
+  <button id="startBtn">Начать</button>
+</div>
+<div class="container question" id="q1">
+  <h2>Вопрос 1: Какой ты по знаку зодиака?</h2>
+  <div class="answers" id="q1answers"></div>
+  <button id="q1next" disabled>Далее</button>
+</div>
+<div class="container question" id="q2">
+  <h2>Вопрос 2: Что для тебя главное в доме?</h2>
+  <div class="answers">
+    <label><input type="radio" name="q2" value="семейное пространство"> Пространство для семьи</label>
+    <label><input type="radio" name="q2" value="уют и тишина"> Уют и тишина</label>
+    <label><input type="radio" name="q2" value="стиль и статус"> Стиль и статус</label>
+    <label><input type="radio" name="q2" value="природа и участок"> Свой участок и природа</label>
+    <label><input type="radio" name="q2" value="рядом с близкими"> Возможность жить рядом с близкими</label>
+  </div>
+  <button id="q2next" disabled>Далее</button>
+</div>
+<div class="container question" id="q3">
+  <h2>Вопрос 3: Какой образ жизни тебе ближе?</h2>
+  <div class="answers">
+    <label><input type="radio" name="q3" value="семейные вечера"> Семейные вечера и тепло</label>
+    <label><input type="radio" name="q3" value="заботы и сад"> Хозяйственные заботы и сад</label>
+    <label><input type="radio" name="q3" value="вечеринки"> Принимать гостей, устраивать вечеринки</label>
+    <label><input type="radio" name="q3" value="личное пространство"> Отдых в одиночестве и личное пространство</label>
+    <label><input type="radio" name="q3" value="путешествия"> Динамика, путешествия и редкие возвращения</label>
+  </div>
+  <button id="q3next" disabled>Далее</button>
+</div>
+<div class="container question" id="q4">
+  <h2>Вопрос 4: Кем ты себя ощущаешь?</h2>
+  <div class="answers">
+    <label><input type="radio" name="q4" value="защитник"> Защитник семьи</label>
+    <label><input type="radio" name="q4" value="душа компании"> Душа компании</label>
+    <label><input type="radio" name="q4" value="интроверт"> Интроверт с большим внутренним миром</label>
+    <label><input type="radio" name="q4" value="организатор"> Организатор уюта</label>
+    <label><input type="radio" name="q4" value="уверенный хозяин"> Уверенный хозяин пространства</label>
+  </div>
+  <button id="finish" disabled>Завершить</button>
+</div>
+<div class="container" id="result">
+  <h2 id="signName"></h2>
+  <h3 id="houseName"></h3>
+  <p id="houseDesc"></p>
+  <p id="personal"></p>
+  <button id="apply">Отправить заявку</button>
+</div>
+<script>
+const zodiacOptions = [
+  {sign:'Овен', house:'Дом «Большой с гаражом»', desc:'Овны – лидеры, которым нужно пространство и чёткие границы. Отдельный гараж, кирпичная надёжность, большая кухня-гостиная — всё как они любят.'},
+  {sign:'Телец', house:'Дом «Малый с навесом»', desc:'Телец — ценитель комфорта и природы. Просторная терраса, свой участок, место для мангала и утреннего кофе с видом на лес.'},
+  {sign:'Близнецы', house:'Таунхаус', desc:'Любят перемены и гибкость. Две спальни, кабинет, уютная гостиная для встреч. Легко перепланировать под настроение.'},
+  {sign:'Рак', house:'Дуплекс', desc:'Рак – про семейность и «домашность». Дуплекс с отдельным входом и тёплой планировкой станет настоящей крепостью.'},
+  {sign:'Лев', house:'Дом «Большой с навесом»', desc:'Просторный, светлый, с зоной для вечеринок и уличным камином. Львы любят блистать, и такой дом — их сцена.'},
+  {sign:'Дева', house:'Дом «Малый с гаражом»', desc:'Девам важна практичность. Гараж, экономия, чёткие зоны, всё аккуратно и удобно.'},
+  {sign:'Весы', house:'Таунхаус', desc:'Баланс стиля, комфорта и цены. Весам важно, чтобы дом «выглядел» — у них будет терраса, в которой хорошо смотрятся гости и летние закаты.'},
+  {sign:'Скорпион', house:'Дом «Большой с гаражом»', desc:'Скорпион — стратег. Гараж, изоляция, чёткая безопасность. Можно затаиться, можно пригласить друзей.'},
+  {sign:'Стрелец', house:'Дом «Большой с навесом»', desc:'Любят свободу. Простор, лес рядом, место для кемпера, велосипеда, вечеринок.'},
+  {sign:'Козерог', house:'Дом «Малый с гаражом»', desc:'Стратегия, разум и долгосрочность. У Козерогов всё просчитано. Этот дом — как инвестиция.'},
+  {sign:'Водолей', house:'Дуплекс', desc:'Водолеи за современные форматы. Умный дом, независимость, возможно жить с друзьями по соседству, или обустроить студию.'},
+  {sign:'Рыбы', house:'Дом «Малый с навесом»', desc:'Просторный, но не громоздкий. Светлая студия-гостиная, тихая спальня, свой пруд поблизости.'}
+];
+let current = 0;
+const answers = {};
+const startDiv = document.getElementById('start');
+const q1Div = document.getElementById('q1');
+const q2Div = document.getElementById('q2');
+const q3Div = document.getElementById('q3');
+const q4Div = document.getElementById('q4');
+const resultDiv = document.getElementById('result');
+const q1answers = document.getElementById('q1answers');
+const q1next = document.getElementById('q1next');
+
+zodiacOptions.forEach((opt,i)=>{
+  const id = 'z'+i;
+  const label = document.createElement('label');
+  label.innerHTML = `<input type="radio" name="zodiac" value="${opt.sign}"> ${opt.sign}`;
+  q1answers.appendChild(label);
+});
+
+startDiv.querySelector('#startBtn').onclick = ()=>{
+  startDiv.style.display='none';
+  q1Div.style.display='block';
+};
+q1answers.addEventListener('change',e=>{
+  answers.sign = e.target.value;
+  q1next.disabled=false;
+});
+q1next.onclick=()=>{
+  q1Div.style.display='none';
+  q2Div.style.display='block';
+};
+q2Div.addEventListener('change',e=>{
+  answers.q2=e.target.value;
+  q2Div.querySelector('button').disabled=false;
+});
+q2Div.querySelector('button').onclick=()=>{
+  q2Div.style.display='none';
+  q3Div.style.display='block';
+};
+q3Div.addEventListener('change',e=>{
+  answers.q3=e.target.value;
+  q3Div.querySelector('button').disabled=false;
+});
+q3Div.querySelector('button').onclick=()=>{
+  q3Div.style.display='none';
+  q4Div.style.display='block';
+};
+q4Div.addEventListener('change',e=>{
+  answers.q4=e.target.value;
+  q4Div.querySelector('button').disabled=false;
+});
+q4Div.querySelector('button').onclick=()=>{
+  q4Div.style.display='none';
+  showResult();
+};
+function showResult(){
+  const res = zodiacOptions.find(z=>z.sign===answers.sign);
+  document.getElementById('signName').textContent = res.sign;
+  document.getElementById('houseName').textContent = res.house;
+  document.getElementById('houseDesc').textContent = res.desc;
+  document.getElementById('personal').textContent = `Ты выбрал(а): ${answers.q2}, предпочитаешь ${answers.q3}, и ощущаешь себя как '${answers.q4}'. Такой дом подойдёт тебе идеально!`;
+  resultDiv.style.display='block';
+}
+document.getElementById('apply').onclick=()=>{
+  alert('Заявка отправлена!');
+};
+</script>
+</body>
+</html>
